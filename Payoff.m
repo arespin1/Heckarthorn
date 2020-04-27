@@ -10,7 +10,7 @@ function P = Payoff(i,l,params)
     % Compute D for each strategy
     P = zeros(6,1);
     for s = 1:6
-        P(s) = pp{s};
+        P(s) = pp{s}();
     end
 
     function p = full_defection() 

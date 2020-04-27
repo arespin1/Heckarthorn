@@ -26,19 +26,22 @@ params.V = zeros(params.N,1);
 %   4      Oc2
 params.O = zeros(params.N,4); 
 
-% Set of actors in different choices of interpersonal control
+% Set of actors in different choices of interpersonal control.
+% The values have to be logical
 % Each column represent the following:
 % Column  Set
 %   1     Sd1
 %   2     Sc2
 %   3     So2
-params.S = zeros(params.N,3);
+params.S = false(params.N,3);
 
 % Vector of actors efficacies
 % Each column resprents the following:
 % Column  Vector
 %   1      Ec2
 %   2      Eo2
+params.E = zeros(params.N,2);
+
 
 % Vector of actors costs
 % Each column represent the following:
@@ -57,33 +60,41 @@ params.K = zeros(params.N,3);
 % Od1 is initialized with a uniform random distribution
 params.O(:,1) = rand(params.N,1);
 % All actors start at universal full defection
-params.S(:,1) = ones(params.N,1);
-% Initialize values for all agents
+params.S(:,1) = true;
+% Initialize values for all agents (fixed value)
 params.V(:,1) = 100;
+% Initialize costs for all agents (fixed values)
+params.K(:,1) = 2;  % Contribution cost
+params.K(:,2) = 5;  % Cost of compliance control
+params.K(:,3) = 3;  % Cost of oppositional control
 
-% Results vector initialized
-results = zeros(params.N,3);
-% Actors taking turns
-for i = 1:params.N
-    % Compute payoff and the strategy used by agent i
-    [p, L, strategy] = compute_P(i,params);
-    % Update parameters with the given strategy 
-    update_vectors(i,params,strategy);
-    % Save vector of production, strategies and L (production level) 
-    % These are the possible values for strategies:
-    %     Initial Strategy               Payoff Strategy
-    % --------------------------------------------------------------
-    %   1 Full defection                Full defection
-    %   2 Private cooperation           Private cooperation
-    %   3 Compliant control             Full cooperation
-    %   4 Hypocritical defection        Hypocritical cooperation
-    %   5 Oppositional control          Compliant opposition
-    %   5 Full opposition               Full opposition 
-   
-    results(i,:) = [p strategy L];
+disp('Starting simulation');
+res = simulate(params);
+disp(res);
+
+function results = simulate(params)
+    % Results vector initialized
+    results = zeros(params.N,3);
+    % Actors taking turns
+    for i = 1:params.N
+        % Compute payoff and the strategy used by agent i
+        [p, L, strategy] = compute_P(i,params);
+
+        % Save vector of production, strategies and L (production level)
+        % These are the possible values for strategies:
+        %     Initial Strategy               Payoff Strategy
+        % --------------------------------------------------------------
+        %   1 Full defection                Full defection
+        %   2 Private cooperation           Private cooperation
+        %   3 Compliant control             Full cooperation
+        %   4 Hypocritical defection        Hypocritical cooperation
+        %   5 Oppositional control          Compliant opposition
+        %   5 Full opposition               Full opposition
+
+        results(i,:) = [p strategy L];
+    end
+
 end
-
-
 
 
 
