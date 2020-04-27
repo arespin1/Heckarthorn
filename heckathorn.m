@@ -56,21 +56,29 @@ params.K = zeros(params.N,3);
 %   Actors takes turns
 %   Actors define move based on expected payoff 
 
-% Define initial parameters
-% Od1 is initialized with a uniform random distribution
-params.O(:,1) = rand(params.N,1);
-% All actors start at universal full defection
-params.S(:,1) = true;
-% Initialize values for all agents (fixed value)
-params.V(:,1) = 100;
-% Initialize costs for all agents (fixed values)
-params.K(:,1) = 2;  % Contribution cost
-params.K(:,2) = 5;  % Cost of compliance control
-params.K(:,3) = 3;  % Cost of oppositional control
-
 disp('Starting simulation');
-res = simulate(params);
-disp(res);
+% Number of simulations
+N = 3;
+results = zeros(params.N,3,N);
+
+for i=1:N
+    % Define initial parameters
+    % Od1 is initialized with a uniform random distribution
+    params.O(:,1) = rand(params.N,1);
+    % All actors start at universal full defection
+    params.S(:,1) = true;
+    % Initialize values for all agents (fixed value)
+    params.V(:,1) = 100;
+    % Initialize costs for all agents (fixed values)
+    params.K(:,1) = 2;  % Contribution cost
+    params.K(:,2) = 5;  % Cost of compliance control
+    params.K(:,3) = 3;  % Cost of oppositional control
+    
+    % Simulate
+    results(:,:,i) = simulate(params);
+end
+
+disp(results);
 
 function results = simulate(params)
     % Results vector initialized
