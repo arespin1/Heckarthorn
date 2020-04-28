@@ -58,29 +58,36 @@ params.K = zeros(params.N,3);
 
 disp('Starting simulation');
 % Number of simulations
-N = 3;
+N = 200;
 results = zeros(params.N,3,N);
+Prod = zeros(N,2);
 
 for i=1:N
     % Define initial parameters
     % Od1 is initialized with a uniform random distribution
     params.O(:,1) = rand(params.N,1);
+    % Oc2 is initialized with a uniform random distribution
+    %params.O(:,4) = rand(params.N,1);
+    % Ec2 is initialized with a uniform distribution
+    %params.E(:,1) = rand(params.N,1);
     % All actors start at universal full defection
     params.S(:,1) = true;
     % Initialize values for all agents (fixed value)
-    params.V(:,1) = 100;
+    % Vary Value with N
+    params.V(:,1) = i/2;
     % Initialize costs for all agents (fixed values)
-    params.K(:,1) = 2;  % Contribution cost
-    params.K(:,2) = 5;  % Cost of compliance control
-    params.K(:,3) = 3;  % Cost of oppositional control
-    
+    params.K(:,1) = 9; %+ 3*randn(params.N,1);  % Contribution cost
+    params.K(:,2) = 3;  % Cost of compliance control
+    params.K(:,3) = 4;  % Cost of oppositional control
+    % Initialize Prod result with mean value of V
+    Prod(i,1) = mean(params.V);
     % Simulate
-    results(:,:,i) = simulate(params);
+    [results(:,:,i),Prod(i,2)] = simulate(params);
 end
 
-disp(results);
+disp('simulation finished');
 
-function results = simulate(params)
+function [results,Lf] = simulate(params)
     % Results vector initialized
     results = zeros(params.N,3);
     % Actors taking turns
@@ -100,7 +107,12 @@ function results = simulate(params)
         %   5 Full opposition               Full opposition
 
         results(i,:) = [p strategy L];
+        
     end
+    
+    % Compute final production accomplished
+    D = sum(results(:,2) == 1) + sum(results(:,2) == 5);
+    Lf = 1 - (D./params.N).^params.F;
 
 end
 
