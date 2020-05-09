@@ -1,19 +1,19 @@
-% General charts with processed data
-% Create a chart by plotting more and reshaping
+% Produce charts over processed data
+% Use available variables to create plots
 
-% In this example Prod has 200 values for V, we want to average to 100
-Ls = mean(reshape(Prod(:,2),2,[]),1);
-Ls = movmean(Ls,4);
 % Plot the data
 figure;
-plot(1:size(Prod,1)/2,Ls,1:size(Prod,1)/2,Ls1,'LineWidth',2);
+plot(prod_wo_co(:,1),prod_wo_co(:,2),prod_w_cc(:,1),prod_w_cc(:,2),...
+    prod_w_op(:,1),prod_w_op(:,2),'LineWidth',2);
 xlabel('V (value)');
 ylabel('L (production)');
-kc1 = 'K_{c1} = 9';
-kc2 = 'K_{c2} = 3';
-text(101,0.95,kc1);
-text(101,0.90,kc2);
-legend('Compliant Control','No compliant control','Location','northwest');
+kc1 = 'K_{c1} = ' + string(mean(params.K(:,1)));
+kc2 = 'K_{c2} = ' + string(mean(params.K(:,2)));
+ko2 = 'K_{o2} = ' + string(mean(params.K(:,3)));
+x = max(prod_wo_co(:,1))+1;
+text(x,0.95,kc1);
+text(x,0.90,kc2);
+text(x,0.85,ko2);
+legend('No compliant control','Compliant Control','Oppositional Control','Location','northwest');
 
-% Plot additional data
-Ls1 = mean(reshape(Prod(:,2),2,[]),1);
+

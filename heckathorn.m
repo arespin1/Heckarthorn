@@ -56,65 +56,72 @@ params.K = zeros(params.N,3);
 %   Actors takes turns
 %   Actors define move based on expected payoff 
 
-disp('Starting simulation');
 % Number of simulations
-N = 200;
-results = zeros(params.N,3,N);
-Prod = zeros(N,2);
+N = 5;
+Vin = 20;
+Vfin = 150;
 
-for i=1:N
-    % Define initial parameters
-    % Od1 is initialized with a uniform random distribution
-    params.O(:,1) = rand(params.N,1);
-    % Oc2 is initialized with a uniform random distribution
-    %params.O(:,4) = rand(params.N,1);
-    % Ec2 is initialized with a uniform distribution
-    %params.E(:,1) = rand(params.N,1);
-    % All actors start at universal full defection
-    params.S(:,1) = true;
-    % Initialize values for all agents (fixed value)
-    % Vary Value with N
-    params.V(:,1) = i/2;
-    % Initialize costs for all agents (fixed values)
-    params.K(:,1) = 9; %+ 3*randn(params.N,1);  % Contribution cost
-    params.K(:,2) = 3;  % Cost of compliance control
-    params.K(:,3) = 4;  % Cost of oppositional control
-    % Initialize Prod result with mean value of V
-    Prod(i,1) = mean(params.V);
-    % Simulate
-    [results(:,:,i),Prod(i,2)] = simulate(params);
-end
+% All actors start at universal full defection
+params.S(:,1) = true;
+% Initialize costs for all agents (fixed values)
+params.K(:,1) = 11; %+ 3*randn(params.N,1);  % Contribution cost
+params.K(:,2) = 3;  % Cost of compliance control
+params.K(:,3) = 10;  % Cost of oppositional control
+
+disp('Simulating homogeneous without Compliance Control');
+% Define initial parameters
+% Od1 is initialized with a uniform random distribution
+params.O(:,1) = rand(params.N,1);
+% Oc2 is initialized with a uniform random distribution
+%params.O(:,4) = rand(params.N,1);
+% Ec2 is initialized with a uniform distribution
+%params.E(:,1) = rand(params.N,1);
+% Initialize Prod result with mean value of V
+prod_wo_co = run_simulation(N,Vin,Vfin, params);
+
+disp('Simulating homogeneous with Compliance Control');
+% Define initial parameters
+% Od1 is initialized with a uniform random distribution
+params.O(:,1) = rand(params.N,1);
+% Oc2 is initialized with a uniform random distribution
+params.O(:,4) = rand(params.N,1);
+% Ec2 is initialized with a uniform distribution
+params.E(:,1) = rand(params.N,1);
+% Ec2 is initialized with zero
+params.E(:,2) = 0;
+% Initialize Prod result with mean value of V
+prod_w_cc = run_simulation(N,Vin,Vfin, params);
+
+disp('Simulating homogeneous with Oppositional Control');
+% Define initial parameters
+% Od1 is initialized with a uniform random distribution
+params.O(:,1) = rand(params.N,1);
+% Oc2 is initialized with a uniform random distribution
+params.O(:,4) = rand(params.N,1);
+% Ec2 is initialized with a uniform distribution
+params.E(:,1) = rand(params.N,1);
+% Eo2 is initialized with a uniform distribution
+params.E(:,2) = rand(params.N,1);
+% Initialize Prod result with mean value of V
+prod_w_op = run_simulation(N,Vin,Vfin, params);
 
 disp('simulation finished');
 
-function [results,Lf] = simulate(params)
-    % Results vector initialized
-    results = zeros(params.N,3);
-    % Actors taking turns
-    for i = 1:params.N
-        % Compute payoff and the strategy used by agent i
-        [p, L, strategy] = compute_P(i,params);
+function production = run_simulation(N, Vini, Vfin, params) 
 
-        % Save vector of production, strategies and L (production level)
-        % These are the possible values for strategies:
-        %     Initial Strategy               Payoff Strategy
-        % --------------------------------------------------------------
-        %   1 Full defection                Full defection
-        %   2 Private cooperation           Private cooperation
-        %   3 Compliant control             Full cooperation
-        %   4 Hypocritical defection        Hypocritical cooperation
-        %   5 Oppositional control          Compliant opposition
-        %   5 Full opposition               Full opposition
+    % Initialize production return vector
+    production = zeros(Vfin-Vini,2);
 
-        results(i,:) = [p strategy L];
-        
+    for v=Vini:Vfin
+        pr = 0;
+        params.V(:,1) = v;
+        production(v,1) = v;
+        for i=1:N
+            % Simulate
+            [~,p] = simulate(params);
+            pr = pr + p;
+        end
+        production(v,2) = pr/N;
     end
     
-    % Compute final production accomplished
-    D = sum(results(:,2) == 1) + sum(results(:,2) == 5);
-    Lf = 1 - (D./params.N).^params.F;
-
 end
-
-
-
