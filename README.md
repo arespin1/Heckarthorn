@@ -14,4 +14,6 @@ Consider all three types of heterogeneity examined in previous studies:
 2.	Costs
 3.	Resources
 
-Examine a broad array of production functions
+Current implementation is supporting homogeneous case only, but support is added for full heterogeneity.
+
+To use it modify the paramenters in the main script: heckathorn.m according to the simulation needs, you could re-use the simulation blocks or add a new one with your own parametrization for the simulation and then run the simulation. To look for results, run the script chart.m to produce a figure with output showing the results of simulations over V (the value of public good).
